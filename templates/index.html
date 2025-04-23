@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML Compiler</title>
+    <style>
+        textarea { width: 100%; height: 200px; }
+        button { margin-top: 10px; margin-right: 10px; padding: 10px 20px; }
+        #output-box { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
+    </style>
+</head>
+<body>
+    <h2>HTML Compiler & Fixer</h2>
+    <textarea id="codeInput" name="code" placeholder="Enter HTML here..."></textarea><br>
+    <button onclick="compileCode()">Compile</button>
+    <button onclick="fixCode()">Fix Code</button>
+
+    <div id="output-box">
+        <h3>Output:</h3>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function compileCode() {
+            const code = document.getElementById("codeInput").value;
+            fetch("/compile", {
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: "code=" + encodeURIComponent(code)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("output").innerHTML = data.output;
+                } else {
+                    document.getElementById("output").innerText = "❌ Error: " + data.error;
+                }
+            });
+        }
+
+        function fixCode() {
+            const code = document.getElementById("codeInput").value;
+            fetch("/fix", {
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: "code=" + encodeURIComponent(code)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("codeInput").value = data.fixed_code;
+                    document.getElementById("output").innerText = "✅ Code fixed successfully!";
+                } else {
+                    document.getElementById("output").innerText = "❌ Fix Error: " + data.error;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
